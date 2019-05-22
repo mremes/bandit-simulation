@@ -1,4 +1,5 @@
 from .common import Bandit
+from ..reward import Reward
 
 
 class EpsilonFirstBandit(Bandit):
@@ -7,9 +8,9 @@ class EpsilonFirstBandit(Bandit):
         self.T = T
 
     def __str__(self):
-        return f'e-first, e = {self.epsilon}'
+        return f'ε-first, ε = {self.epsilon}'
 
-    def draw(self, agent):
+    def draw(self, agent) -> Reward:
         if agent.t < self.epsilon * self.T:
             return agent.any_action()
         else:

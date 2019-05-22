@@ -1,5 +1,6 @@
-from numpy.random import random
+from numpy import random
 from .common import Bandit
+from ..reward import Reward
 
 
 class EpsilonGreedyBandit(Bandit):
@@ -7,10 +8,11 @@ class EpsilonGreedyBandit(Bandit):
         self.epsilon = epsilon
 
     def __str__(self):
-        return f'e-greedy, e = {self.epsilon}'
+        return f'ε-greedy, ε = {self.epsilon}'
 
-    def draw(self, agent):
-        sample = random()
+    def draw(self, agent) -> Reward:
+        random.seed(agent.t)
+        sample = random.random()
         if sample < self.epsilon:
             return agent.any_action()
         else:
