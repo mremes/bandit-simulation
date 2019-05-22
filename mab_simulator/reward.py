@@ -14,6 +14,9 @@ class Reward:
     def sample(self):
         return self.distribution_fn()
 
+    def __str__(self):
+        return self.label
+
 
 class Rewards:
 
@@ -27,6 +30,8 @@ class Rewards:
         return self.k
 
     def __getitem__(self, item):
+        if isinstance(item, Reward):
+            return self.rewards[item.label]
         return self.rewards[item]
 
     def get_container(self, default_value=0):
@@ -35,7 +40,7 @@ class Rewards:
     def best_action(self):
         return self.rewards[self.best]
 
-    def any_action(self):
+    def any_action(self, seed=0):
         return self.rewards[random.choice(list(self.rewards.keys()))]
 
     def init_rewards(self):
@@ -44,16 +49,21 @@ class Rewards:
 
 class NormallyDistributedRandomRewards(Rewards):
 
-    def __init__(self, k, stddev=0.5):
+    def __init__(self, k, mu_max=10, stddev=0.5, seed=10):
+        self.mu_max = mu_max
         self.stddev = stddev
+        self.seed = seed
+        self.params = []
         super().__init__(k)
 
     def init_rewards(self):
         best = 0
+        numpy.random.seed(self.seed)
         for reward, _ in self.rewards.items():
-            loc = numpy.random.randint(1, self.k+1)
+            loc = numpy.random.random() * self.mu_max
             if loc > best:
                 self.best = reward
                 best = loc
             params = (loc, self.stddev)
+            self.params.append(params)
             self.rewards[reward] = Reward(reward, numpy.random.normal, loc, params)

@@ -11,6 +11,7 @@ class Agent:
         self.Q = rewards.get_container()
         self.N = rewards.get_container()
         self.best_action = None
+        self.best_action_value = 0
         self.t = 0
         self.reward = 0
         self.pseudo_regret = 0
@@ -25,15 +26,20 @@ class Agent:
 
         self.N[label] += 1
         self.Q[label] += (1 / self.N[label]) * (win - self.Q[label])
-        self.best_action = self.actions[max(self.Q.items(), key=operator.itemgetter(1))[0]]
 
+        if not self.best_action:
+            self.best_action = reward
+        elif reward != self.best_action and self.Q[label] > self.best_action_value:
+            self.best_action = reward
+
+        self.best_action_value = self.Q[self.best_action.label]
         self.t += 1
         self.reward += win
         self.regret += regret
         self.pseudo_regret += expected_regret
 
     def any_action(self):
-        return self.actions.any_action()
+        return self.actions.any_action(seed=self.t)
 
     def get_best_action(self):
         return self.best_action or self.any_action()
