@@ -1,8 +1,12 @@
 import pylab
+import numpy as np
 
 from mab_simulator.agent import Agent
 from mab_simulator.reward import NormallyDistributedRandomRewards
-from mab_simulator.algorithms import EpsilonGreedyBandit, EpsilonFirstBandit
+from mab_simulator.algorithms import EpsilonGreedyBandit, EpsilonFirstBandit, UCB1Bandit
+
+from scipy import stats
+from numpy import sqrt
 
 
 class AgentMetrics:
@@ -25,11 +29,21 @@ def register_agent(a: Agent):
     agents.append(AgentMetrics(a))
 
 
-rounds = 10000
-rewards = NormallyDistributedRandomRewards(10, 1)
+rounds = 1000
+n_actions = 5
+rewards = NormallyDistributedRandomRewards(n_actions, mu_max=5, stddev=2, seed=42)
+for i, ps in enumerate(rewards.params):
+    mu, sigma = ps
+    x = np.linspace(mu - 3*sigma, mu + 3*sigma, 100)
+    pylab.plot(x, stats.norm.pdf(x, mu, sigma), label=f'{i+1}')
 
-register_agent(Agent(rewards, EpsilonGreedyBandit(0.1)))
-register_agent(Agent(rewards, EpsilonFirstBandit(0.1, rounds)))
+pylab.legend(loc='upper left')
+pylab.savefig(f'rewards_k{n_actions}_{rewards.mu_max}_{rewards.stddev}_{rewards.seed}')
+pylab.show()
+
+register_agent(Agent(rewards, EpsilonGreedyBandit(0.10)))
+register_agent(Agent(rewards, EpsilonFirstBandit(0.10, rounds)))
+register_agent(Agent(rewards, UCB1Bandit(sqrt(2))))
 
 for _ in range(rounds):
     for m in agents:
@@ -39,7 +53,16 @@ for _ in range(rounds):
 x = range(1, rounds+1)
 for m in agents:
     y = m.pseudo_regret
-    pylab.plot(x, y, label=m.agent.name)
+    pylab.plot(x, y, label=m.agent.algorithm)
 
 pylab.legend(loc='upper left')
+pylab.savefig(f'regret_{rounds}')
+pylab.show()
+
+for m in agents:
+    y = m.reward
+    pylab.plot(x, y, label=m.agent.algorithm)
+
+pylab.legend(loc='upper left')
+pylab.savefig(f'reward_{rounds}')
 pylab.show()
