@@ -1,1 +1,1 @@
-# mab_simulator
+# Multi-Armed Bandit Simulation

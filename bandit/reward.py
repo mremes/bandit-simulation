@@ -1,5 +1,4 @@
 import numpy
-import random
 from .common import container_for
 from typing import Dict
 
@@ -41,7 +40,10 @@ class Rewards:
         return self.rewards[self.best]
 
     def any_action(self, seed=0):
-        return self.rewards[random.choice(list(self.rewards.keys()))]
+        numpy.random.seed(seed)
+        idx = numpy.random.randint(len(self.rewards))
+        label = sorted(list(self.rewards.keys()))[idx]
+        return self.rewards[label]
 
     def init_rewards(self):
         raise NotImplementedError

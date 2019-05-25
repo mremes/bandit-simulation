@@ -1,5 +1,3 @@
-import operator
-
 from .reward import Rewards, Reward
 from .algorithms import Bandit
 

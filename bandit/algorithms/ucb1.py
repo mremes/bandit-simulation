@@ -8,7 +8,7 @@ class UCB1Bandit(Bandit):
         self.c = c
 
     def __str__(self):
-        return f'ucb1, c = {self.c}'
+        return f'UCB1, c = {round(self.c, 3)}'
 
     @staticmethod
     def _get_uncertainty(agent, action):

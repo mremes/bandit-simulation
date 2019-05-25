@@ -124,6 +124,3 @@ dmypy.json
 
 # IDE
 .idea/
-
-# Pictures
-*.png
